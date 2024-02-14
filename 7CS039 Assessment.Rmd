@@ -1,0 +1,531 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+#install.packages("ggpubr")
+#install.packages("magrittr")
+#install.packages("magrittr")
+#install.packages("dplyr")
+library(magrittr)
+library(dplyr)
+library("ggpubr")
+```
+```{r}
+
+```
+
+
+
+
+```{r}
+melanoma
+```
+```{r}
+mean(melanoma$time)
+mean(melanoma$status)
+mean(melanoma$sex)
+mean(melanoma$age)
+mean(melanoma$year)
+mean(melanoma$thickness)
+mean(melanoma$ulcer)
+```
+
+
+```{r}
+var(melanoma$time)
+var(melanoma$status)
+var(melanoma$sex)
+var(melanoma$age)
+var(melanoma$year)
+var(melanoma$thickness)
+var(melanoma$ulcer)
+```
+
+
+```{r}
+sd(melanoma$time)
+sd(melanoma$status)
+sd(melanoma$sex)
+sd(melanoma$age)
+sd(melanoma$year)
+sd(melanoma$thickness)
+sd(melanoma$ulcer)
+```
+
+
+```{r}
+median(melanoma$time)
+median(melanoma$status)
+median(melanoma$sex)
+median(melanoma$age)
+median(melanoma$year)
+median(melanoma$thickness)
+median(melanoma$ulcer)
+```
+
+
+```{r}
+summary(melanoma)
+
+```
+
+
+```{r}
+melanoma$status = factor(melanoma$status)
+melanoma$sex = factor(melanoma$sex)
+melanoma$year = factor(melanoma$year)
+melanoma$ulcer = factor(melanoma$ulcer)
+summary(melanoma)
+```
+
+
+```{r}
+library(tidyverse)
+melanoma <- as_tibble(melanoma)
+melanoma
+attach(melanoma)
+melanoma <- melanoma%>%
+  mutate(status = recode_factor(status,  '1' = "Died From Melanoma", '2' = "Alive", '3' = "Died From Unrelated Causes")) %>%
+  mutate(sex = recode_factor(sex,  '0' = "Female", '1' = "Male")) %>%
+  mutate(ulcer = recode_factor(ulcer,  '0' = "Absent", '1' = "Present"))
+melanoma
+```
+
+
+
+
+
+
+
+
+```{r}
+par(mfrow=c(2,2))
+hist(melanoma$time, main = "Survival Time in Days Since the Operation", col = "red", border = "black", xlab = "DAYS", ylab = "PATIENTS", axes = TRUE, labels = TRUE, ylim = c(0,70), xlim = c(0,7000))
+hist(melanoma$age, main = "Age in Years at the Time of the Operation", col = "green", border = "black", xlab = "AGE", ylab = "PATIENTS", axes = TRUE, labels = TRUE, ylim = c(0,70), xlim = c(0,120))
+hist(melanoma$thickness, main = "Tumour Thickness in MM", col = "orange", border = "black", xlab = "THICKNESS", ylab = "PATIENTS", axes = TRUE, labels = TRUE, ylim = c(0,120), xlim = c(0,20))
+
+
+
+```
+
+
+
+
+
+
+
+
+```{r}
+a=ggplot2::qplot(x = status,
+      data = melanoma, main = "Patients Status at the End of the Study",
+      xlab = "STATUS",
+      ylab = "PATIENTS",
+      fill = I("purple"))
+b=ggplot2::qplot(x = sex,
+      data = melanoma, main = "The patients' Gender",
+      xlab = "SEX",
+      ylab = "PATIENTS",
+      fill = I("blue"))
+
+c=ggplot2::qplot(x = year,
+      data = melanoma, main = "Year of Operation",
+      xlab = "YEAR",
+      ylab = "PATIENTS",
+      fill = I("gray"))
+
+d=ggplot2::qplot(x = ulcer,
+      data = melanoma, main = "Indicator of Ulceration",
+      xlab = "ULCERATION",
+      ylab = "PATIENTS",
+      fill = I("cyan"))
+
+ggarrange(
+  a,
+  b,
+  c,
+  d, labels = c("A", "B", "c", "D"), ncol = 2, nrow = 2
+)
+```
+
+
+
+
+
+
+
+
+
+
+```{r}
+a=ggplot2::qplot(x = status, y = time,
+      geom = "boxplot",
+      data = melanoma, main = "Fluctuations in Survival Time",
+      xlab = "The Patients Status at the End of the Study",
+      ylab = "Survival Time in Days",
+      fill = I("cyan"))
+b=ggplot2::qplot(x = sex, y = time,
+      geom = "boxplot",
+      data = melanoma, main = "Fluctuations in Survival Time",
+      xlab = "The Patients Sex",
+      ylab = "Survival Time in Days",
+      fill = I("green"))
+c=ggplot2::qplot(x = year, y = time,
+      geom = "boxplot",
+      data = melanoma, main = "Fluctuations in Survival Time",
+      xlab = "Year of operation",
+      ylab = "Survival Time in Days",
+      fill = I("blue"))
+d=ggplot2::qplot(x = ulcer, y = time,
+      geom = "boxplot",
+      data = melanoma, main = "Fluctuations in Survival Time",
+      xlab = "Indicator of ulceration",
+      ylab = "Survival Time in Days",
+      fill = I("red"))
+
+ggarrange(
+  a,
+  b,
+  c,
+  d, labels = c("A", "B", "c", "D"), ncol = 2, nrow = 2
+)
+```
+
+
+
+
+
+
+```{r}
+
+
+melanoma %>%
+  group_by(status) %>%
+  summarise(num.obs = n(),
+            mean_time = round(mean(time), 0),
+            sd_time = round(mean(time), 0),
+            se_time = round(mean(time), 0))
+melanoma %>%
+  group_by(sex) %>%
+  summarise(num.obs = n(),
+            mean_time = round(mean(time), 0),
+            sd_time = round(mean(time), 0),
+            se_time = round(mean(time), 0))
+melanoma %>%
+  group_by(year) %>%
+  summarise(num.obs = n(),
+            mean_time = round(mean(time), 0),
+            sd_time = round(mean(time), 0),
+            se_time = round(mean(time), 0))
+melanoma %>%
+  group_by(ulcer) %>%
+  summarise(num.obs = n(),
+            mean_time = round(mean(time), 0),
+            sd_time = round(mean(time), 0),
+            se_time = round(mean(time), 0))
+```
+
+
+```{r}
+a=ggplot2::qplot(x = status, y = age,
+      geom = "boxplot",
+      data = melanoma, main = "Effect of the Patients' Age",
+      xlab = "The patients status at the end of the study",
+      ylab = "Age in years",
+      fill = I("blue"))
+b=ggplot2::qplot(x = sex, y = age,
+      geom = "boxplot",
+      data = melanoma, main = "Effect of the Patients' Age",
+      xlab = "The patients sex",
+      ylab = "Age in years",
+      fill = I("green"))
+c=ggplot2::qplot(x = year, y = age,
+      geom = "boxplot",
+      data = melanoma, main = "Effect of the Patients' Age",
+      xlab = "Year of operation",
+      ylab = "Age in years",
+      fill = I("purple"))
+d=ggplot2::qplot(x = ulcer, y = age,
+      geom = "boxplot",
+      data = melanoma, main = "Effect of the Patients' Age",
+      xlab = "Indicator of ulceration",
+      ylab = "Age in years",
+      fill = I("magenta"))
+
+ggarrange(
+  a,
+  b,
+  c,
+  d, labels = c("A", "B", "c", "D"), ncol = 2, nrow = 2
+)
+```
+
+
+
+
+```{r}
+
+melanoma %>%
+  group_by(status) %>%
+  summarise(num.obs = n(),
+            mean_age = round(mean(age), 0),
+            sd_age = round(mean(age), 0),
+            se_age = round(mean(age), 0))
+melanoma %>%
+  group_by(sex) %>%
+  summarise(num.obs = n(),
+            mean_age = round(mean(age), 0),
+            sd_age = round(mean(age), 0),
+            se_age = round(mean(age), 0))
+melanoma %>%
+  group_by(year) %>%
+  summarise(num.obs = n(),
+            mean_age = round(mean(age), 0),
+            sd_age = round(mean(age), 0),
+            se_age = round(mean(age), 0))
+melanoma %>%
+  group_by(ulcer) %>%
+  summarise(num.obs = n(),
+            mean_age = round(mean(age), 0),
+            sd_age = round(mean(age), 0),
+            se_age = round(mean(age), 0))
+```
+
+
+```{r}
+a=ggplot2::qplot(x = status, y = thickness,
+      geom = "boxplot",
+      data = melanoma, main = "Effect of the Thickness of the Tumour",
+      xlab = "The patients status at the end of the study",
+      ylab = "Tumour thickness in mm",
+      fill = I("blue"))
+b=ggplot2::qplot(x = sex, y = thickness,
+      geom = "boxplot",
+      data = melanoma, main = "Effect of the Thickness of the Tumour",
+      xlab = "The patients sex",
+      ylab = "Tumour thickness in mm",
+      fill = I("green"))
+c=ggplot2::qplot(x = year, y = thickness,
+      geom = "boxplot",
+      data = melanoma, main = "Effect of the Thickness of the Tumour",
+      xlab = "Year of operation",
+      ylab = "Tumour thickness in mm",
+      fill = I("purple"))
+d=ggplot2::qplot(x = ulcer, y = thickness,
+      geom = "boxplot",
+      data = melanoma, main = "Effect of the Thickness of the Tumour",
+      xlab = "Indicator of ulceration",
+      ylab = "Tumour thickness in mm",
+      fill = I("magenta"))
+
+ggarrange(
+  a,
+  b,
+  c,
+  d, labels = c("A", "B", "C", "D"), ncol = 2, nrow = 2
+)
+```
+
+
+
+```{r}
+melanoma %>%
+  group_by(status) %>%
+  summarise(num.obs = n(),
+            mean_thickness = round(mean(thickness), 0),
+            sd_thickness = round(mean(thickness), 0),
+            se_thickness = round(mean(thickness), 0))
+melanoma %>%
+  group_by(sex) %>%
+  summarise(num.obs = n(),
+            mean_thickness = round(mean(thickness), 0),
+            sd_thickness = round(mean(thickness), 0),
+            se_thickness = round(mean(thickness), 0))
+melanoma %>%
+  group_by(year) %>%
+  summarise(num.obs = n(),
+            mean_thickness = round(mean(thickness), 0),
+            sd_thickness = round(mean(thickness), 0),
+            se_thickness = round(mean(thickness), 0))
+melanoma %>%
+  group_by(ulcer) %>%
+  summarise(num.obs = n(),
+            mean_thickness = round(mean(thickness), 0),
+            sd_thickness = round(mean(thickness), 0),
+            se_thickness = round(mean(thickness), 0))
+```
+
+
+```{r}
+attach(melanoma)
+cor(time, thickness, method = "pearson")
+plot(time, thickness, main = "Scatter Plot", col = "orange", xlab = "TIME", ylab = "THICKNESS")
+my_model = lm(formula = thickness ~ time)
+my_model
+summary(my_model)
+LinReg <- lm(thickness ~ time)
+abline(LinReg, col = "green", lwd = 2)
+LinReg
+summary(LinReg)
+predict(LinReg, data.frame(time = 3000))
+pred_LinReg <- predict(LinReg, data.frame(time = seq(from = 0, to = 7000, by = 250)))
+names(pred_LinReg) <- seq(0, 7000, 250)
+pred_LinReg
+PolyReg <- lm(thickness ~ poly(time, 5, raw = TRUE))
+lines(c(10:5565), predict(PolyReg, data.frame(time = c(10:5565))), col = "red")
+pred_PolyReg <- predict(PolyReg, data.frame(time = seq(0, 7000, 250)))
+names(pred_PolyReg) <- seq(0, 7000, 250)
+pred_PolyReg
+abline(h = mean(thickness), col = "blue")
+mean(thickness)
+
+
+cor(time, age, method = "pearson")
+plot(time, age, main = "Scatter Plot", col = "orange", xlab = "TIME", ylab = "AGE")
+my_model = lm(formula = age ~ time)
+my_model
+summary(my_model)
+LinReg <- lm(age ~ time)
+abline(LinReg, col = "green", lwd = 2)
+LinReg
+summary(LinReg)
+predict(LinReg, data.frame(time = 3000))
+pred_LinReg <- predict(LinReg, data.frame(time = seq(from = 0, to = 7000, by = 250)))
+names(pred_LinReg) <- seq(0, 7000, 250)
+pred_LinReg
+PolyReg <- lm(age ~ poly(time, 5, raw = TRUE))
+lines(c(10:5565), predict(PolyReg, data.frame(time = c(10:5565))), col = "red")
+pred_PolyReg <- predict(PolyReg, data.frame(time = seq(0, 7000, 250)))
+names(pred_PolyReg) <- seq(0, 7000, 250)
+pred_PolyReg
+abline(h = mean(age), col = "blue")
+mean(age)
+
+
+cor(thickness, age, method = "pearson")
+plot(thickness, age, main = "Scatter Plot", col = "orange", xlab = "THICKNESS", ylab = "AGE")
+my_model = lm(formula = age ~ thickness)
+my_model
+summary(my_model)
+LinReg <- lm(age ~ thickness)
+abline(LinReg, col = "green", lwd = 2)
+LinReg
+summary(LinReg)
+predict(LinReg, data.frame(thickness = 7))
+pred_LinReg <- predict(LinReg, data.frame(thickness = seq(from = 0, to = 20, by = 0.5)))
+names(pred_LinReg) <- seq(0, 20, 0.5)
+pred_LinReg
+PolyReg <- lm(age ~ poly(thickness, 5, raw = TRUE))
+lines(c(0.10:17.42), predict(PolyReg, data.frame(thickness = c(0.10:17.42))), col = "red")
+pred_PolyReg <- predict(PolyReg, data.frame(thickness = seq(0, 20, 0.5)))
+names(pred_PolyReg) <- seq(0, 20, 0.5)
+pred_PolyReg
+abline(h = mean(age), col = "blue")
+mean(age)
+```
+
+
+```{r}
+thickness_t_test <- t.test(thickness ~ sex, data = melanoma)
+thickness_t_test
+time_t_test <- t.test(time ~ sex, data = melanoma)
+time_t_test
+age_t_test <- t.test(age ~ sex, data = melanoma)
+age_t_test
+```
+
+
+```{r}
+p_thickness <- ggplot(data = melanoma, aes(sample = thickness))
+p_thickness + stat_qq() + stat_qq_line()
+p_thickness + stat_qq() + stat_qq_line() + facet_grid(. ~ sex)
+
+p_age <- ggplot(data = melanoma, aes(sample = age))
+p_age + stat_qq() + stat_qq_line()
+p_age + stat_qq() + stat_qq_line() + facet_grid(. ~ sex)
+
+p_time <- ggplot(data = melanoma, aes(sample = time))
+p_time + stat_qq() + stat_qq_line()
+p_time + stat_qq() + stat_qq_line() + facet_grid(. ~ sex)
+```
+
+
+
+
+
+```{r}
+#help(qplot)
+#help("hist")
+#help("cor")
+#help("attach")
+#help("plot")
+#help("par")
+help("ggarrange")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+plot(cars)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
